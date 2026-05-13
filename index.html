@@ -97,6 +97,24 @@ body {
 .step-line.done { background: #cb691a; }
 .error-msg { text-align: center; font-size: 13px; color: #E24B4A; padding: 0.75rem 0 0; display: none; }
 .hint { text-align: center; font-size: 12px; color: #888780; margin-top: 1.5rem; letter-spacing: 0.03em; }
+
+.gift-bar {
+  padding: 1rem 1.25rem;
+  border-top: 0.5px solid rgba(0,0,0,0.08);
+  background: #fdf6f0;
+}
+.gift-label {
+  font-size: 12px;
+  color: #cb691a;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.gift-items {
+  font-size: 13px;
+  color: #5f5e5a;
+  line-height: 1.8;
+}
 </style>
 </head>
 <body>
@@ -143,6 +161,12 @@ body {
     <div class="status-label">目前進度</div>
     <div class="steps" id="steps-row"></div>
   </div>
+  <div class="gift-bar" id="gift-bar" style="display:none">
+    <div class="gift-label">🎁 贈品</div>
+    <div class="gift-items">
+      A6 收納袋 × 1<br>神秘姓名貼 × 1
+    </div>
+  </div>
 </div>
 
 <div class="hint">如有疑問歡迎私訊聯繫</div>
@@ -183,12 +207,19 @@ function doSearch() {
 
     var itemsEl = document.getElementById('r-items');
     itemsEl.innerHTML = data.items.map(function(it) {
-      var sticker = it.sticker ? ' &middot; ' + it.sticker : '';
+      var sticker = it.sticker ? ' · ' + it.sticker : '';
+      var qty = it.qty && it.qty > 1 ? ' <span class="item-name">x' + it.qty + '</span>' : '';
       var name = it.name ? '<span class="item-name">（' + it.name + '）</span>' : '';
-      return '<div class="item-line">' + it.style + sticker + name + '</div>';
+      return '<div class="item-line">' + it.style + sticker + name + qty + '</div>';
     }).join('');
 
     renderSteps(data.status);
+
+    // 贈品判斷：總額 >= 1000
+    var totalNum = parseInt((data.total || '').replace(/[^0-9]/g, ''), 10);
+    var giftBar = document.getElementById('gift-bar');
+    giftBar.style.display = (!isNaN(totalNum) && totalNum >= 1000) ? 'block' : 'none';
+
     card.style.display = 'block';
   };
 
